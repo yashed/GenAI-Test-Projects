@@ -12,8 +12,10 @@ import time
 # Setup Google API credentials
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
+# Authenticate with Google Drive
 def authenticate_google_drive():
     creds = None
+    print("Path - " , os.path.exists('token.json'))
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
     if not creds or not creds.valid:
@@ -27,6 +29,7 @@ def authenticate_google_drive():
             token.write(creds.to_json())
     return build('drive', 'v3', credentials=creds)
 
+# List files and subfolders in Google Drive within a specific folder
 def list_files(service, folder_id):
     """List files and subfolders in Google Drive within a specific folder."""
     query = f"'{folder_id}' in parents"
@@ -35,6 +38,7 @@ def list_files(service, folder_id):
         fields="nextPageToken, files(id, name, mimeType, modifiedTime)").execute()
     return results.get('files', [])
 
+# Fetch content from Google Docs or Slides
 def fetch_file_content(service, file_id, mime_type):
     """Fetch content from Google Docs or Slides."""
     if mime_type == "application/vnd.google-apps.document":
@@ -45,9 +49,14 @@ def fetch_file_content(service, file_id, mime_type):
         return slides.decode('utf-8')
     return None
 
+# Embed and store document data in vector database
 def process_and_store_content(contents, vector_db, file_name):
     """Embed and store document data in vector database."""
     embeddings = OpenAIEmbeddings()
+
+    """Chroma vector store handles embedding creation when you add texts. 
+    don't need to separately generate embeddings"""
+
     texts = [contents]
     metadatas = [{"source": file_name}]
     vector_db.add_texts(texts, metadatas)
@@ -100,7 +109,7 @@ def main():
     while True:
         print("Checking for updates...")
         track_changes_recursive(service, folder_id, vector_db)
-        time.sleep(600)  # Check every 10 minutes
+        time.sleep(60)  # Change this to change the interval between checks
 
 if __name__ == "__main__":
     main()
