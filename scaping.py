@@ -19,12 +19,14 @@ OPENAI_API_KEY = "sk-proj-ylXrGVPAtaZC1Br9moQ0uexuwqWc4UYH0z15TsUB7w7pm3ckKwRWQf
 # Initialize ChatOpenAI instance
 llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, model="gpt-4-turbo")
 
+
 # Function to scrape data asynchronously
 async def scrape_imdb_page(url):
     # Load HTML content using PlaywrightLoader
     loader = PlaywrightLoader([url])
     docs = await loader.aload()
     return docs[0].page_content
+
 
 # Main script
 async def main():
@@ -44,7 +46,9 @@ async def main():
     # Combine extracted content
     extracted_content = []
     for title, paragraph in zip(titles, paragraphs):
-        extracted_content.append(f"Title: {title.get_text(strip=True)}\nDescription: {paragraph.get_text(strip=True)}")
+        extracted_content.append(
+            f"Title: {title.get_text(strip=True)}\nDescription: {paragraph.get_text(strip=True)}"
+        )
 
     # Print extracted content
     for item in extracted_content:
@@ -55,7 +59,5 @@ async def main():
     splits = splitter.create_documents([str(extracted_content)])
     print(f"Split documents: {splits}")
 
-# Run the script
+
 asyncio.run(main())
-
-
