@@ -5,16 +5,20 @@ from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import PlaywrightLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from bs4 import BeautifulSoup
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv(override=True)
+
+# Replace with your API Key and Search Engine ID
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Apply nest_asyncio to avoid async conflicts
 nest_asyncio.apply()
 
 # Define the URL
 url = "https://www.imdb.com/list/ls566941243/"
-
-
-# OpenAI API key
-OPENAI_API_KEY = "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"
 
 # Initialize ChatOpenAI instance
 llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, model="gpt-4-turbo")
